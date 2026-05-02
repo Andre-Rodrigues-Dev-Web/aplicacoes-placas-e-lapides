@@ -1,0 +1,26 @@
+AcceptPathInfo On
+Options -MultiViews
+
+# ── CORS ───────────────────────────────────────────────────────────
+<IfModule mod_headers.c>
+    # Allow any localhost origin (dev) and exact production domain
+    SetEnvIf Origin "^http://localhost(:[0-9]+)?$" ALLOWED_ORIGIN=$0
+    SetEnvIf Origin "^https?://lembrancasvip\.com\.br$" ALLOWED_ORIGIN=$0
+
+    Header always set Access-Control-Allow-Origin "%{ALLOWED_ORIGIN}e" env=ALLOWED_ORIGIN
+    Header always set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+    Header always set Access-Control-Allow-Headers "Content-Type, Authorization, X-Requested-With"
+    Header always set Access-Control-Allow-Credentials "true"
+
+    # Preflight cache
+    Header always set Access-Control-Max-Age "86400"
+</IfModule>
+
+# Handle OPTIONS preflight
+RewriteEngine On
+RewriteCond %{REQUEST_METHOD} OPTIONS
+RewriteRule ^(.*)$ $1 [R=200,L]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ index.php [QSA,L]
